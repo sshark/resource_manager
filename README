@@ -1,2 +1,22 @@
 This is the GCloud's resource manager modules in Scala.
 
+Original modules were written in Java but i thought what the heck right?
+We should have alternatives and if someone from the lab's sick of 
+coding in Java, he/she should have the flexibility to be able to code
+in some other language, in this case Scala. 
+
+Scala's really done a good job in increasing productivity because 
+i type less due to the relatively good type inferencer running and
+checking the validity of the code and because of this, code is 
+written tighter. More readable in a functional manner.
+
+If you have seen the original version written in Java, the Scala
+version will be relatively easier to follow since the approach i've 
+taken is to at least map the file names so you don't have to go 
+thru the centre of the Earth & back (whew).
+
+Hope you had fun looking at it!
+
+Raymond
+
+
