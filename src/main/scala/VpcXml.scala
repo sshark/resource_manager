@@ -1,3 +1,5 @@
+import scala.xml._
+
 abstract class CompartmentWeb {
     val zone : String
     val fwrules : Seq[FWRule]
@@ -223,7 +225,6 @@ object XmlConverter {
               yield fromXML2Machine(n)
         }
     }
-
 }
 
 object TestXml extends Application {
