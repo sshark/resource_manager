@@ -3,9 +3,8 @@ abstract class Status {
   val status: String
 
   def toXML = 
-    <system>
+    <machine>
       <vpc>{vpc}</vpc>
       <status>{status}</status>
-    </system>
+    </machine>
 }
-

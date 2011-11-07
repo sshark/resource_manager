@@ -34,11 +34,6 @@ import com.mongodb.casbah.commons._
  */
 class VPCResource extends ServerResource {
 
-    def withXmlParser(doc: String)(op: DocumentBuilder => Document) : Document = {
-      val parser = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-      op(parser)
-    }
-
     /**
      * Gets the configuration of the requested virtual private cloud
      * matched by 'project_id'

@@ -11,7 +11,8 @@ class ResourceManager extends Application {
 	}
 	override def createInboundRoot():Restlet = {
 		val router = new Router(getContext())
-        router.attach("http://localhost:8111/vpc/{project_id}/status/", classOf[VPCResource])
+        router.attach("http://localhost:8111/vpc/{project_id}/config/", classOf[VPCResource])
+        router.attach("http://localhost:8111/vpc/{project_id}/status/", classOf[Diagnostic])
 		router
 	}
 }

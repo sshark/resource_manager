@@ -12,6 +12,9 @@ import org.xml.sax.helpers._
 
 // Scala 2.9 refs.
 import scala.xml._
+import scala.actors._
+import scala.actors.Actor._
+import scala.actors.Futures._
 
 // Third party refs.
 import org.custommonkey.xmlunit._
@@ -45,13 +48,65 @@ class Diagnostic extends ServerResource {
    		val id = getRequestAttributes().get("project_id")
         val configCol = MongoConnection()("vpc")("configuration")
         val record = MongoDBObject("project_id" -> id)
-        val cursor = configCol.find(record)
-        if (cursor.hasNext) {
-          val rec: DBObject = cursor.next
-          val webIds = xml.XML.loadString((rec.get("moab_web_rsrv_id")).asInstanceOf[String])
-          val appIds = xml.XML.loadString((rec.get("moab_app_rsrv_id")).asInstanceOf[String])
-          val dbIds = xml.XML.loadString((rec.get("moab_db_rsrv_id")).asInstanceOf[String])
+        configCol.findOne(record).foreach { rec =>
+          val webIds = rec.get("moab_web_rsrv_id").asInstanceOf[BasicDBList]
+          val appIds = rec.get("moab_app_rsrv_id").asInstanceOf[BasicDBList]
+          val dbIds = rec.get("moab_db_rsrv_id").asInstanceOf[BasicDBList]
+
+          import scala.collection.mutable._
+          var xmlList = new ListBuffer[Future[Status]]
+          val docList = new ListBuffer[Elem]
+
+          webIds.toArray.foreach {
+              id => xmlList += checkStatus(id.asInstanceOf[String]) 
+          }
+          xmlList.foreach {
+              x => docList += x().toXML
+          }
+          xmlList = new ListBuffer[Future[Status]] 
+          appIds.toArray.foreach {
+              id => xmlList += checkStatus(id.asInstanceOf[String]) 
+          }
+          xmlList.foreach {
+              x => docList += x().toXML
+          }
+          xmlList = new ListBuffer[Future[Status]] 
+          dbIds.toArray.foreach { id => xmlList += checkStatus(id.asInstanceOf[String]) } 
+          xmlList.foreach {
+              x => docList += x().toXML
+          }
+      
+          buildJDom(docList.toList)
+       }
+    }
+
+    def checkStatus(projectId: String) : Future[Status] = {
+        val f = future { 
+        val proc: Process = new ProcessBuilder("./getvmstatus.sh", "-n" + projectId).start
+        val input = new Array[Byte](256)
+        withBufferedInput(proc.getInputStream)(reader => reader.read(input,0,255)) 
+        val xmlString = (new String(input)).trim
+        new Status {
+                val status = ((xml.XML.loadString(xmlString) \\ "request") \ "status").text
+                val vpc  = projectId
+            } 
+        }
+        f
+    }
+    def withBufferedInput(source: InputStream)(op: InputStream => Unit) {
+        val bufferedInput = new BufferedInputStream(source)
+        try {
+            op(bufferedInput)
+        } finally {
+            bufferedInput.close()
         }
     }
+
+    def buildJDom(list: scala.List[Elem]) : org.w3c.dom.Document  = {
+        def toXML = 
+          <system>{ for(ele <- list) yield ele }</system>
+        Elem2JDom.toDom(toXML)
+    }
 }
+
 
