@@ -88,6 +88,7 @@ class Diagnostic extends ServerResource {
         val xmlString = (new String(input)).trim
         new Status {
                 val status = ((xml.XML.loadString(xmlString) \\ "request") \ "status").text
+                val vncPort = ((xml.XML.loadString(xmlString) \\ "request") \ "vncport").text
                 val vpc  = projectId
             } 
         }
