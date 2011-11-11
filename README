@@ -1,5 +1,9 @@
 This is the GCloud's resource manager modules in Scala.
 
+This is a sort of a map in the other repo https://github.com/raygit/resource_manager
+and this repository will likely be a version later though
+i like to be able to keep them synchronized.
+
 Original modules were written in Java but i thought what the heck right?
 We should have alternatives and if someone from the lab's sick of 
 coding in Java, he/she should have the flexibility to be able to code
